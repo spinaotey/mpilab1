@@ -1,9 +1,35 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <mpi.h>
 
 #define sqr(x) ((x)*(x))
 #define ndarts     50000
 #define rounds     100
+
+
+double dboard(int darts);
+
+int main(int argc, char *argv[]){
+    int i;
+    int err;
+    int rank;
+    double pi = 0;
+    
+    err = MPI_Init(&argc, &argv);
+    
+    srandom(0);
+
+    for(i=0; i<rounds; i++){
+        pi = dboard(ndarts);
+        printf("π = %g\n",pi);
+    }
+
+    err = MPI_Finalize();
+
+    return 0;
+    
+}
+
 
 
 double dboard(int darts){
@@ -27,22 +53,4 @@ double dboard(int darts){
     /* calculate pi */
     pi = 4.0 * (double)score/(double)darts;
     return(pi);
-}
-
-
-
-int main(void){
-    int i;
-    int rank;
-    double pi = 0;
-    
-    srandom(0);
-
-    for(i=0; i<rounds; i++){
-        pi = dboard(ndarts);
-        printf("π = %g\n",pi);
-    }
-
-    return 0;
-    
 }
