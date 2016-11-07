@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <mpi.h>
+
 
 #define sqr(x) ((x)*(x))
 #define ndarts     50000
@@ -12,12 +14,15 @@ double dboard(int darts);
 int main(int argc, char *argv[]){
     int i;
     int err;
-    int rank;
-    double pi = 0;
+    int rank, size;
+    double pi;
     
     err = MPI_Init(&argc, &argv);
     
-    srandom(0);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    
+    srandom(((int) time(NULL)) +rank);
 
     for(i=0; i<rounds; i++){
         pi = dboard(ndarts);
