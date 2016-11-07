@@ -15,10 +15,10 @@ int main(int argc, char *argv[]){
     int i;
     int err;
     int rank, size;
-    double pi;
+    double pi,result;
     
     err = MPI_Init(&argc, &argv);
-    
+
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     
@@ -26,7 +26,11 @@ int main(int argc, char *argv[]){
 
     for(i=0; i<rounds; i++){
         pi = dboard(ndarts);
-        printf("π = %g\n",pi);
+        MPI_Reduce(&pi, &result, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+        if(rank == 0){
+            result /= size;
+            printf("π = %g\n",result);
+        }
     }
 
     err = MPI_Finalize();
