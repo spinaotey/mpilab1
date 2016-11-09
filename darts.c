@@ -21,16 +21,18 @@ double dboard(int darts);
 
 
 /*  Computes an approximation of pi by throwing ndarts in parallel
- *  to different boards, and averages the resulint pies. This is
+ *  to different boards, and averages the resulting π's. This is
  *  done for many rounds.
  */
 
 int main(int argc, char *argv[]){
     /* VARIABLES */
-    int i;              // Dummy variable
+    int i,j;              // Dummy variable
     int err;            // Error handling
     int rank, size;     // MPI variables
-    double pi,result;   // Pi approximations and final result
+    int master = 0, masterTag = 1<<10;
+    MPI_Status status;
+    double pi,aux;   // Pi approximations and final result
     
     /* INTIATE PARALLELIZATION AND RANDOM */
     err = MPI_Init(&argc, &argv);
@@ -45,12 +47,16 @@ int main(int argc, char *argv[]){
 
     for(i=0; i<rounds; i++){
         pi = dboard(ndarts);
-        // Sum over all the pi's obtained and send it to the master
-        MPI_Reduce(&pi, &result, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+        if(rank != master)
+            MPI_Send(&pi,1,MPI_DOUBLE,master,masterTag,MPI_COMM_WORLD);
         // Master computes average and prints it out
-        if(rank == 0){
-            result /= size;
-            printf("π = %g\n",result);
+        if(rank == master){
+            for(j=1; j<size; j++){
+                MPI_Recv(&aux,1,MPI_DOUBLE,j,masterTag,MPI_COMM_WORLD,&status);
+                pi += aux;
+            }
+            pi /= size;
+            printf("π = %g\n",pi);
         }
     }
 
