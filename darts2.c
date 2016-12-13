@@ -5,7 +5,6 @@
 
 
 #define sqr(x) ((x)*(x))
-#define ndarts     50000
 
 /*  Dboard
  * 
@@ -20,7 +19,7 @@ unsigned dboard(unsigned darts);
 
 
 /*  Computes an approximation of pi by throwing ndarts in parallel
- *  to different boards, and averages the resulint pies. This is
+ *  to different boards, and averages the resuling π's. This is
  *  done for many rounds.
  */
 
@@ -31,8 +30,14 @@ int main(int argc, char *argv[]){
     int rank, size;     // MPI variables
     int master = 0;
     unsigned aux, succ_darts;
+    int ndarts;
     double pi;   // Pi approximations and final result
     
+    if(sscanf(argv[1],"%d",&ndarts)!= 1){
+        fprintf(stderr,"Error. Correct way of executing: ./%s ndarts\n",argv[0]);
+        return -1;
+    }
+
     /* INTIATE PARALLELIZATION AND RANDOM */
     err = MPI_Init(&argc, &argv);
 

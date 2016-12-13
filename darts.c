@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <mpi.h>
 
 
 #define sqr(x) ((x)*(x))
-#define ndarts     50000
 #define rounds     100
 
 /*  Dboard
@@ -31,8 +31,14 @@ int main(int argc, char *argv[]){
     int err;            // Error handling
     int rank, size;     // MPI variables
     int master = 0, masterTag = 1<<10;
+    int ndarts;
     MPI_Status status;
     double pi,aux;   // Pi approximations and final result
+    
+    if(sscanf(argv[1],"%d",&ndarts)!= 1){
+        fprintf(stderr,"Error. Correct way of executing: ./%s ndarts\n",argv[0]);
+        return -1;
+    }
     
     /* INTIATE PARALLELIZATION AND RANDOM */
     err = MPI_Init(&argc, &argv);
